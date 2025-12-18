@@ -22,69 +22,6 @@ export const CityDropdown: React.FC<CityDropdownProps> = ({
   loading
 }) => {
   return (
-//     <div className="bg-white rounded-sm h-12.5 w-full pl-3">
-//       <div className="flex gap-2">
-//         <h6 className="text-xs text-[#785ef7]">CITY OR AREA</h6>
-//         <img
-//           src="../img/downarrow.svg"
-//           className="w-3 h-4 cursor-pointer"
-//           alt="Dropdown"
-//           onClick={() => {
-//             if (!showDropdown2) fetchCities();
-//             setShowDropdown2(!showDropdown2);
-//           }}
-//         />
-//       </div>
-
-//       <div className="text-sm font-normal w-full bg-transparent border-none outline-none
-//  relative">
-//         <input
-//           type="text"
-//           className="font-semibold w-full"
-//           value={city}
-//           placeholder="Search City"
-//           onChange={(e) => {
-//             setCity(e.target.value);
-//             setShowDropdown2(true);
-//           }}
-//           onClick={() => {
-//             fetchCities();
-//             setShowDropdown2(true);
-//           }}
-//         />
-
-//         {showDropdown2 && (
-//           <ul className="absolute top-full left-0 w-full bg-white border shadow-md max-h-60 overflow-auto z-10">
-//             {loading ? (
-//               <li className="p-2 text-gray-500">Loading...</li>
-//             ) : (
-//               cities
-//                 .filter((c) => {
-//                   if (!city) return true;
-//                   return (c?.name || "")
-//                     .toLowerCase()
-//                     .includes(city.toLowerCase());
-//                 })
-//                 .map((c) => (
-//                   <li
-//                     key={c.id}
-//                     className="p-2 cursor-pointer hover:bg-gray-200"
-//                     onClick={() => {
-//                       setCity(`${c.name}, ${c.state_name}, ${c.country_name}`);
-//                       setSelectedCityCode(c.tbo_city_code);
-//                       setShowDropdown2(false);
-//                     }}
-//                   >
-//                     <span className="font-semibold">{c.name}</span>,{" "}
-//                     <span className="text-gray-500">{c.state_name}</span>,{" "}
-//                     <span className="text-gray-400">{c.country_name}</span>
-//                   </li>
-//                 ))
-//             )}
-//           </ul>
-//         )}
-//       </div>
-//     </div>
 
  <ui.FormField label="City or Area" icon={icons.MapPin}>
       <ui.Popover open={showDropdown2} onOpenChange={setShowDropdown2}>

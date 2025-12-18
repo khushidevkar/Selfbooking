@@ -3,6 +3,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { pages } from '.';
+import Home from './Homepage/Home'
 
 const App: React.FC = () => {
   return (
@@ -15,7 +16,7 @@ const App: React.FC = () => {
         <Route path="/hotel-search" element={<pages.HotelSearchPage />} />
         
         {/* Default route */}
-        <Route path="/" element={<Navigate to="/hotel-search" replace />} />
+        <Route path="/" element={<Home />} />
         
         {/* 404 fallback */}
         <Route path="*" element={<Navigate to="/hotel-search" replace />} />
