@@ -1,17 +1,6 @@
-import { ui, icons } from "@/index";
-// import '@/styles/scrollbar.css'
 
-interface CompanyDropdownProps {
-  company: string;
-  setCompany: (val: string) => void;
-  companies: string[];
-  showDropdown: boolean;
-  setShowDropdown: (val: boolean) => void;
-  fetchCompanies: () => void;
-  loading: boolean;
-}
-
-export const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
+import { ui, icons, searchHotelFormTypes } from "@/index";
+export const CompanyDropdown: React.FC<searchHotelFormTypes.CompanyDropdownProps> = ({
   company,
   setCompany,
   companies,
@@ -21,10 +10,6 @@ export const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   loading
 }) => {
   return (
-
-
-
-
     <ui.FormField label="Company" icon={icons.Building2}>
       <ui.Popover open={showDropdown} onOpenChange={setShowDropdown}>
         <ui.PopoverTrigger asChild>
@@ -34,7 +19,9 @@ export const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
             aria-expanded={showDropdown}
             className="w-full justify-between h-11 bg-white hover:bg-gray-50 border-gray-200"
             onClick={() => {
-              if (!showDropdown) fetchCompanies();
+              if (!showDropdown && companies.length === 0) {
+                fetchCompanies();
+              }
               setShowDropdown(true);
             }}
           >
@@ -50,14 +37,22 @@ export const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
               placeholder="Search company..." 
               value={company}
               onValueChange={setCompany}
-              
             />
             <ui.CommandList className="custom-scrollbar">
               <ui.CommandEmpty>
-                {loading ? "Loading..." : "No company found."}
+                {loading ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#785ef7]"></div>
+                      <span className="text-sm text-gray-500">Loading companies...</span>
+                    </div>
+                  </div>
+                ) : (
+                  "No company found."
+                )}
               </ui.CommandEmpty>
               <ui.CommandGroup>
-                {companies
+                {!loading && companies
                   .filter((comp) =>
                     comp.toLowerCase().includes(company.toLowerCase())
                   )
@@ -70,20 +65,17 @@ export const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
                         setShowDropdown(false);
                       }}
                       className="
-                       cursor-pointer
-    rounded-md
-    px-3 py-2
-    transition-colors
-    text-sm
-
-    hover:bg-[#785ef7]/5
-
-    data-[selected=true]:bg-[#785ef7]/10
-    data-[selected=true]:text-[#785ef7]
-
-    data-[disabled=true]:opacity-50
-    data-[disabled=true]:pointer-events-none
-  "
+                        cursor-pointer
+                        rounded-md
+                        px-3 py-2
+                        transition-colors
+                        text-sm
+                        hover:bg-[#785ef7]/5
+                        data-[selected=true]:bg-[#785ef7]/10
+                        data-[selected=true]:text-[#785ef7]
+                        data-[disabled=true]:opacity-50
+                        data-[disabled=true]:pointer-events-none
+                      "
                     >
                       {comp}
                     </ui.CommandItem>
@@ -94,6 +86,5 @@ export const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
         </ui.PopoverContent>
       </ui.Popover>
     </ui.FormField>
-
   );
 };

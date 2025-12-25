@@ -1,13 +1,65 @@
 
-// export type Hotel = {
-//   HotelCode: string;
-// };
+export interface ExternalHotelSearchPayload {
+  checkIn?: string;
+  checkindate?: string;
+  checkOut?: string;
+  checkoutdate?: string;
+
+  Rooms?: number | string;
+  room_count?: number | string;
+
+  Adults?: number | string;
+  PassengerADT?: number | string;
+
+  Children?: number | string;
+  Passengerchild?: number | string;
+
+  ChildAge?: number[];
+  Passengerchildage?: string | null;
+
+  CityCode?: string;
+  city?: string;
+  city_name?: string;
+
+  corporate_name?: string | null;
+  payment?: number | string;
+
+  admin_id?: string;
+  booking_id?: string;
+  booknow?: string;
+
+  spoc_name?: string;
+  approver1_email?: string;
+  approver2_email?: string;
+}
+
+
+export interface HotelSearchParams {
+  checkIn: string;
+  checkOut: string;
+  Rooms: number;
+  Adults: number;
+  Children: number;
+  ChildAge: number[];
+  CityCode?: string;
+  corporate_name?: string | null;
+  city_name: string;
+  payment?: number;
+  filteredCities?: Array<{
+    Name: string;
+    tbo_city_code: string;
+  }>;
+  admin_id?: string;
+  booking_id?: string;
+  booknow?: string;
+  spoc_name?: string;
+  approver1?: string;
+  approver2?: string;
+}
 
 export type HotelLoaderProps = {
   step: number;
 };
-
-// src/hotel/types/hotel.ts
 
 export interface HotelImage {
   url: string;
@@ -16,8 +68,7 @@ export interface HotelImage {
 
 export interface DayRate {
   BasePrice: number;
-  Date?: string;
-  [key: string]: any;
+
 }
 
 export interface CancellationPolicy {
@@ -53,6 +104,7 @@ export interface Hotel {
   HotelFacilities?: string[];
   Rooms?: Room[];
   Source?: string;
+  RateConditions: unknown;
 }
 
 export interface HotelCityItem {
@@ -82,35 +134,10 @@ export interface HotelData {
   [hotelCode: string]: unknown;
 }
 
-
-export interface HotelSearchParams {
-  checkIn: string;
-  checkOut: string;
-  Rooms: number;
-  Adults: number;
-  Children: number;
-  ChildAge: number[];
-  CityCode?: string;
-  corporate_name?: string | null;
-  City_name: string;
-  payment?: number;
-  filteredCities?: Array<{
-    Name: string;
-    tbo_city_code: string;
-  }>;
-  admin_id?: string;
-  booking_id?: string;
-  booknow?: string;
-  spoc_name?: string;
-  approver1?: string;
-  approver2?: string;
-}
-
-
 export interface HotelApiItem {
   HotelCode: string;
   HotelName: string;
-  HotelRating: string; // "ThreeStar" etc.
+  HotelRating: number; 
   ImageUrls?: { ImageUrl: string }[];
   Address: string;
   Attractions?: string[];
@@ -140,7 +167,7 @@ export interface HotelCodesResponse {
 export interface HotelSearchItem {
   HotelCode: string;
   HotelName?: string;
-  HotelRating?: number | string;
+  HotelRating?: number;
   CityName?: string;
   Address?: string;
   Description?: string;
@@ -148,7 +175,7 @@ export interface HotelSearchItem {
   Images?: string[];
   Map?: string;
   HotelFacilities?: string[];
-  Rooms?: any[]; // you can refine this later if you know the structure
+  Rooms?: Room[];
   Source?: string;
 }
 
@@ -160,12 +187,12 @@ export interface HotelSearchResponse {
   HotelResult: HotelSearchItem[];
 }
 
-export interface City {
-  CityId: string;
-  CityName: string;
-  CountryCode: string;
-  CountryName: string;
-}
+// export interface City {
+//   CityId: string;
+//   CityName: string;
+//   CountryCode: string;
+//   CountryName: string;
+// }
 
 export interface SelectedRoom extends Room {
   HotelCode: string;
@@ -227,6 +254,15 @@ export type FilterType =
   | 'search';
 
 
+  export type FilterValueMap = {
+  price: [number, number];
+  rating: number;
+  facility: string;
+  meal: string;
+  refundable: boolean | null;
+  search: string;
+};
+
 export interface FilterState {
   priceRange: [number, number];
   selectedRatings: number[];
@@ -234,4 +270,12 @@ export interface FilterState {
   mealType: string;
   refundable: boolean | null;
   searchQuery: string;
+}
+
+export interface GroupedHotel {
+  HotelCode: string;
+  HotelName: string;
+  CityName?: string;
+  Description?: string;
+  rooms: SelectedRoom[];
 }

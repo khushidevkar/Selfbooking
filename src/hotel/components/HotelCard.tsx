@@ -1,248 +1,18 @@
 
-// import { motion } from 'framer-motion';
-// import { FaStar, FaRegStar } from 'react-icons/fa';
-
-// interface HotelCardProps {
-//   hotel: any;
-//   booknow: string;
-//   agent_portal: string;
-//   onViewPrice: (hotel: any) => void;
-//   onBookNow: (hotel: any) => void;
-//   onViewImages: (images: string[]) => void;
-//   extractAttraction: (description: string) => string;
-//   formatCancelPolicies: (policies: any[]) => string[];
-// }
-
-// export const HotelCard: React.FC<HotelCardProps> = ({
-//   hotel,
-//   booknow,
-//   agent_portal,
-//   onViewPrice,
-//   onBookNow,
-//   onViewImages,
-//   extractAttraction,
-//   formatCancelPolicies
-// }) => {
-//   const rooms = hotel?.Rooms || [];
-//   const lowestFareRoom = rooms.reduce(
-//     (min: any, room: any) => (room.TotalFare < min.TotalFare ? room : min),
-//     rooms[0]
-//   );
-
-//   const renderStars = (rating: number) => {
-//     const maxStars = 5;
-//     const fullStars = Math.floor(rating);
-//     const emptyStars = maxStars - fullStars;
-
-//     return (
-//       <>
-//         {Array.from({ length: fullStars }, (_, index) => (
-//           <FaStar key={`full-${index}`} className="text-yellow-500" />
-//         ))}
-//         {Array.from({ length: emptyStars }, (_, index) => (
-//           <FaRegStar key={`empty-${index}`} className="text-gray-300" />
-//         ))}
-//       </>
-//     );
-//   };
-
-//   return (
-//     <div className="w-full py-2 px-3 transition-transform duration-300 hover:scale-[1.02] cursor-pointer">
-//       <div className="w-full bg-white shadow-md rounded border border-white-light flex flex-col md:flex-row gap-3">
-        
-//         {/* Hotel Images */}
-//         <div className="py-3 px-3 w-full md:w-1/3">
-//           <div className="photos-container">
-//             {Array.isArray(hotel.Images) && hotel.Images.length > 0 ? (
-//               <>
-//                 <img
-//                   src={hotel.Images[0]}
-//                   alt="Hotel"
-//                   className="hotel-photo"
-//                 />
-//                 <div className="grid grid-cols-4 gap-2 py-1">
-//                   {hotel.Images.slice(1, 5).map((image: string, index: number) => (
-//                     <div key={index} className="image-container relative">
-//                       <img
-//                         src={image}
-//                         alt={`Hotel ${index + 1}`}
-//                         className={`hotel-photos ${index === 3 ? "blur-sm" : ""}`}
-//                       />
-//                       {index === 3 && (
-//                         <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center">
-//                           <span
-//                             className="text-white text-xs font-semibold cursor-pointer"
-//                             onClick={(e) => {
-//                               e.stopPropagation();
-//                               onViewImages(hotel.Images);
-//                             }}
-//                           >
-//                             View All
-//                           </span>
-//                         </div>
-//                       )}
-//                     </div>
-//                   ))}
-//                 </div>
-//               </>
-//             ) : (
-//               <img alt="" src="./img/image_NA05.png" className="h-full" />
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Hotel Details */}
-//         <div className="w-full md:w-1/2 py-3 px-1">
-//           <h3 className="text-lg font-semibold">
-//             {hotel.HotelName || "No Name Available"}
-//           </h3>
-//           <p className="text-sm font-semibold hotel-form-text-color">
-//             {hotel.CityName || "No City Available"} |{" "}
-//             <span className="text-xs text-gray-500">
-//               {extractAttraction(hotel.Description)}
-//             </span>
-//           </p>
-
-//           {/* Facilities */}
-//           <div className="flex flex-wrap gap-3 text-xs mb-2">
-//             {hotel?.HotelFacilities && (
-//               <>
-//                 {[
-//                   { keyword: "restaurant", label: "Restaurant", icon: "/img/Food.svg" },
-//                   { keyword: "elevator", label: "Elevator", icon: "/img/Elevator.svg" },
-//                   { keyword: "conference", label: "Conference Space", icon: "/img/Conference_Room.svg" },
-//                 ]
-//                   .filter(({ keyword }) =>
-//                     hotel.HotelFacilities.some((facility: string) =>
-//                       facility.toLowerCase().includes(keyword)
-//                     )
-//                   )
-//                   .map(({ icon, label }, index) => (
-//                     <span key={index} className="flex items-center gap-2">
-//                       <img src={icon} alt={label} className="w-5 h-5" />
-//                       {label}
-//                     </span>
-//                   ))}
-//               </>
-//             )}
-//           </div>
-
-//           {/* Inclusions */}
-//           <div className="mb-3">
-//             {hotel?.Rooms?.[0]?.Inclusion && (
-//               <div className="text-xs mt-1 flex gap-2 flex-wrap">
-//                 {hotel.Rooms[0].Inclusion.split(",")
-//                   .slice(0, 3)
-//                   .map((item: string, index: number) => (
-//                     <div key={index} className="flex items-center">
-//                       <span className="text-black-500 mr-1">✓</span>
-//                       <span>{item.trim()}</span>
-//                     </div>
-//                   ))}
-//               </div>
-//             )}
-//           </div>
-
-//           {/* Cancellation Policy */}
-//           <div className="text-xs text-green-700">
-//             {formatCancelPolicies(hotel?.Rooms?.[0]?.CancelPolicies || []).length > 0 ? (
-//               formatCancelPolicies(hotel?.Rooms?.[0]?.CancelPolicies || []).map(
-//                 (policy: string, index: number) => (
-//                   <div key={index} className="flex gap-2">
-//                     <img src="../img/tick.svg" className="w-3 h-5" alt="✔" />
-//                     {policy}
-//                   </div>
-//                 )
-//               )
-//             ) : (
-//               <p className="text-xs text-red-600 flex gap-2">Non Cancellable</p>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Price & Actions */}
-//         <div className="w-full md:w-1/4 py-3 px-3 flex flex-col items-start md:items-end md:border-l border-gray-300 mt-3 md:mt-0">
-//           <div className="flex items-center space-x-1 mb-4">
-//             {renderStars(hotel.HotelRating)}
-//           </div>
-
-//           <div className="relative text-left md:text-right">
-//             <span className="text-lg font-semibold hotel-form-text-color block">
-//               ₹ {lowestFareRoom?.TotalFare || "N/A"}
-//             </span>
-//             <span className="text-xs block">
-//               + ₹ {lowestFareRoom?.TotalTax || "0"} taxes & fees
-//             </span>
-//           </div>
-
-//           <div className="flex mt-5 justify-end md:justify-end gap-2 w-full flex-wrap">
-//             {booknow === "0" && (
-//               <button
-//                 type="button"
-//                 onClick={(e) => {
-//                   e.stopPropagation();
-//                   onViewPrice(hotel);
-//                 }}
-//                 className="bg-[#785ef7] w-full md:w-[110px] h-8 text-white px-2 rounded-md font-semibold text-xs transition duration-300 hover:bg-[#5a3ec8]"
-//               >
-//                 View Price
-//               </button>
-//             )}
-
-//             {agent_portal === "0" && booknow === "1" && (
-//               <button
-//                 className="button_book text-xs w-[91px] h-7"
-//                 onClick={() => onBookNow(hotel)}
-//               >
-//                 Book Now
-//               </button>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-
-
-
-import { hotelTypes } from '@/index';
+import { useState } from 'react';
+import { hotelTypes, ui, icons } from '@/index';
 import { motion } from 'framer-motion';
-import {
-  Star,
-  Utensils,
-  Building2,
-  ArrowUpDown
-} from 'lucide-react';
-
-interface Room {
-  TotalFare: number;
-  TotalTax: number;
-  Inclusion?: string;
-  // CancelPolicies?: any[];
-  CancelPolicies?: hotelTypes.CancellationPolicy[];
-}
-
-interface Hotel {
-  HotelName: string;
-  CityName: string;
-  Description: string;
-  HotelRating: number;
-  Images: string[];
-  Rooms: Room[];
-  HotelFacilities?: string[];
-}
-
 interface HotelCardProps {
-  hotel: Hotel;
+  hotel: hotelTypes.Hotel;
   booknow: string;
   agent_portal: string;
-  onViewPrice: (hotel: Hotel) => void;
-  onBookNow: (hotel: Hotel) => void;
+  onViewPrice: (hotel: hotelTypes.Hotel) => void;
+  onBookNow: (hotel: hotelTypes.Hotel) => void;
   onViewImages: (images: string[]) => void;
   extractAttraction: (description: string) => string;
-  formatCancelPolicies: (policies: any[]) => string[];
+  formatCancelPolicies: (
+    policies: hotelTypes.CancellationPolicy[]
+  ) => string[];
 }
 
 export const HotelCard: React.FC<HotelCardProps> = ({
@@ -255,18 +25,31 @@ export const HotelCard: React.FC<HotelCardProps> = ({
   extractAttraction,
   formatCancelPolicies
 }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const rooms = hotel.Rooms ?? [];
+  const imageCount = hotel.Images?.length || 0;
 
   const lowestFareRoom = rooms.reduce(
     (min, room) => (room.TotalFare < min.TotalFare ? room : min),
     rooms[0]
   );
 
+  // Calculate number of nights from DayRates
+  const numberOfNights = lowestFareRoom?.DayRates?.[0]?.length ?? 1;
+
+  const totalFare = lowestFareRoom?.TotalFare ?? 0;
+  const totalTax = lowestFareRoom?.TotalTax ?? 0;
+  const totalPrice = totalFare + totalTax;
+
+  // Calculate per night prices
+  const perNightFare = totalFare / numberOfNights;
+
   const renderStars = (rating: number) =>
     Array.from({ length: 5 }).map((_, index) => (
-      <Star
+      <icons.Star
         key={index}
-        size={16}
+        size={14}
         className={
           index < rating
             ? 'fill-yellow-400 stroke-yellow-400'
@@ -275,143 +58,284 @@ export const HotelCard: React.FC<HotelCardProps> = ({
       />
     ));
 
-  const hasFacility = (keyword: string) =>
-    hotel.HotelFacilities?.some(f =>
-      f.toLowerCase().includes(keyword)
-    );
+  // Facility icon mapping
+  const facilityIcons: Record<string, { icon: React.ReactNode; label: string }> = {
+    wifi: { icon: <icons.Wifi size={16} />, label: 'Free WiFi' },
+    parking: { icon: <icons.Car size={16} />, label: 'Parking' },
+    restaurant: { icon: <icons.Utensils size={16} />, label: 'Restaurant' },
+    breakfast: { icon: <icons.Coffee size={16} />, label: 'Breakfast' },
+    gym: { icon: <icons.Dumbbell size={16} />, label: 'Gym' },
+    conference: { icon: <icons.Building2 size={16} />, label: 'Conference' },
+  };
+
+  const getAvailableFacilities = () => {
+    const facilities: { icon: React.ReactNode; label: string }[] = [];
+    const facilityList = hotel.HotelFacilities?.map(f => f.toLowerCase()) || [];
+
+    Object.entries(facilityIcons).forEach(([key, value]) => {
+      if (facilityList.some(f => f.includes(key))) {
+        facilities.push(value);
+      }
+    });
+
+    return facilities.slice(0, 4);
+  };
+
+  const cancellationPolicies = formatCancelPolicies(lowestFareRoom?.CancelPolicies ?? []);
+  const isCancellable = cancellationPolicies.length > 0;
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? imageCount - 1 : prev - 1));
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === imageCount - 1 ? 0 : prev + 1));
+  };
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      className="w-full py-2 px-3 cursor-pointer"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.3 }}
+      className="w-full mb-4"
     >
-      <div className="bg-white rounded shadow border flex flex-col md:flex-row gap-3">
+      <ui.Card className="overflow-hidden py-0 border-2 border-[#785ef7]/20 hover:shadow-xl transition-all duration-300 bg-white">
+        <ui.CardContent className="p-0">
+          <div className="flex flex-col lg:flex-row">
 
-        {/* Images */}
-        <div className="w-full md:w-1/3 p-3">
-          {hotel.Images?.length ? (
-            <>
-              <img
-                src={hotel.Images[0]}
-                alt={hotel.HotelName}
-                className="w-full h-44 object-cover rounded"
-              />
-
-              <div className="grid grid-cols-4 gap-2 mt-2">
-                {hotel.Images.slice(1, 5).map((img, i) => (
-                  <div key={i} className="relative">
+            {/* Image Section with Carousel */}
+            <div className="lg:w-80 relative group shrink-0">
+              <div className="relative h-64 lg:h-80">
+                {hotel.Images?.length ? (
+                  <>
+                    {/* Main Carousel Image */}
                     <img
-                      src={img}
-                      alt=""
-                      className={`h-16 w-full object-cover rounded ${
-                        i === 3 ? 'blur-sm' : ''
-                      }`}
+                      src={hotel.Images[currentImageIndex]}
+                      alt={hotel.HotelName}
+                      className="w-full h-full object-cover transition-opacity duration-300"
+                      loading="lazy"
                     />
-                    {i === 3 && (
-                      <div
-                        className="absolute inset-0 flex items-center justify-center text-white text-xs font-semibold bg-black/40"
-                        onClick={(e) => {
-                          e.stopPropagation();
+
+                    {/* Rating Badge - Top Left */}
+                    <ui.Badge className="absolute top-3 left-3 bg-linear-to-r from-[#785ef7] to-[#644ed4] text-white hover:from-[#644ed4] hover:to-[#785ef7] shadow-lg border-0 rounded-md">
+                      <span className="font-bold">{hotel.HotelRating}.0</span>
+                      <icons.Star size={12} className="fill-white ml-1" />
+                    </ui.Badge>
+
+                    {/* Image Counter - Top Right */}
+                    <ui.Badge variant="secondary" className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white hover:bg-black/80 border-0">
+                      {currentImageIndex + 1}/{imageCount}
+                    </ui.Badge>
+
+                    {/* Navigation Arrows */}
+                    {imageCount > 1 && (
+                      <>
+                        <ui.Button
+                          size="icon"
+                          variant="secondary"
+                          onClick={handlePrevImage}
+                          className="absolute bg-white left-2 top-1/2 -translate-y-1/2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all h-9 w-9 cursor-pointer"
+                        >
+                          <icons.ChevronLeft className="h-4 w-4" />
+                        </ui.Button>
+                        <ui.Button
+                          size="icon"
+                          variant="secondary"
+                          onClick={handleNextImage}
+                          className="absolute bg-white right-2 top-1/2 -translate-y-1/2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all h-9 w-9 cursor-pointer"
+                        >
+                          <icons.ChevronRight className="h-4 w-4" />
+                        </ui.Button>
+                      </>
+                    )}
+
+                    {/* View All Photos Button */}
+                    <ui.Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (hotel.Images && hotel.Images.length > 0) {
                           onViewImages(hotel.Images);
-                        }}
-                      >
-                        View All
+                        }
+                      }}
+
+                      className="absolute text-center bg-white bottom-3 left-1/2 transform -translate-x-1/2 shadow-lg hover:scale-105 transition-all cursor-pointer"
+                    >
+                      <icons.ImageIcon className="h-4 w-4 mr-1 text-[#785ef7]" />
+                      View All {imageCount} Photos
+                    </ui.Button>
+
+                    {/* Thumbnail Dots Indicator */}
+                    {imageCount > 1 && imageCount <= 5 && (
+                      <div className="absolute bottom-3 left-3 flex gap-1.5">
+                        {hotel.Images.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCurrentImageIndex(idx);
+                            }}
+                            className={`h-1.5 rounded-full transition-all ${idx === currentImageIndex
+                                ? 'bg-white w-6'
+                                : 'bg-white/60 hover:bg-white/80 w-1.5'
+                              }`}
+                          />
+                        ))}
                       </div>
                     )}
+                  </>
+                ) : (
+                  <div className="w-full h-full bg-linear-to-br from-[#785ef7]/10 to-[#644ed4]/10 flex items-center justify-center">
+                    <icons.Building2 size={48} className="text-[#785ef7]/40" />
                   </div>
-                ))}
+                )}
               </div>
-            </>
-          ) : (
-            <img src="/img/image_NA05.png" alt="NA" />
-          )}
-        </div>
-
-        {/* Details */}
-        <div className="w-full md:w-1/2 p-3">
-          <h3 className="text-lg font-semibold">{hotel.HotelName}</h3>
-
-          <p className="text-sm text-gray-600">
-            {hotel.CityName} ·{' '}
-            <span className="text-xs text-gray-500">
-              {extractAttraction(hotel.Description)}
-            </span>
-          </p>
-
-          {/* Facilities */}
-          <div className="flex flex-wrap gap-4 text-xs my-3">
-            {hasFacility('restaurant') && (
-              <span className="flex items-center gap-1">
-                <Utensils size={14} /> Restaurant
-              </span>
-            )}
-            {hasFacility('conference') && (
-              <span className="flex items-center gap-1">
-                <Building2 size={14} /> Conference
-              </span>
-            )}
-            {hasFacility('elevator') && (
-              <span className="flex items-center gap-1">
-                <ArrowUpDown size={14} /> Elevator
-              </span>
-            )}
-          </div>
-
-          {/* Inclusions */}
-          {rooms[0]?.Inclusion && (
-            <div className="flex flex-wrap gap-2 text-xs">
-              {rooms[0].Inclusion.split(',').slice(0, 3).map((item, i) => (
-                <span key={i}>✓ {item.trim()}</span>
-              ))}
             </div>
-          )}
 
-          {/* Cancellation */}
-          <div className="text-xs mt-2 text-green-700">
-            {formatCancelPolicies(rooms[0]?.CancelPolicies ?? []).length ? (
-              formatCancelPolicies(rooms[0].CancelPolicies!).map((p, i) => (
-                <div key={i}>✓ {p}</div>
-              ))
-            ) : (
-              <span className="text-red-600">Non Cancellable</span>
-            )}
+            {/* Content Section */}
+            <div className="flex-1 flex flex-col lg:flex-row">
+
+              {/* Hotel Details */}
+              <div className="flex-1 p-5 lg:p-6">
+
+                {/* Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-xl font-bold text-gray-900 hover:text-[#785ef7] cursor-pointer transition-colors">
+                        {hotel.HotelName}
+                      </h3>
+                      <div className="flex items-center gap-1">
+                        {renderStars(hotel.HotelRating)}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <icons.MapPin size={14} className="text-red-600" />
+                      <span className="font-medium">{hotel.CityName}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Facilities */}
+                {getAvailableFacilities().length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {getAvailableFacilities().map((facility, i) => (
+                      <ui.Badge
+                        key={i}
+                        variant="outline"
+                        className="bg-[#785ef7]/5 border-[#785ef7]/20 hover:bg-[#785ef7]/10 text-gray-700"
+                      >
+                        <span className="text-[#785ef7] mr-1.5">{facility.icon}</span>
+                        {facility.label}
+                      </ui.Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Inclusions */}
+                {lowestFareRoom?.Inclusion && (
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-x-4 gap-y-2">
+                      {lowestFareRoom.Inclusion.split(',').slice(0, 4).map((item, i) => (
+                        <div key={i} className="flex items-center gap-1.5 text-sm text-gray-700">
+                          <icons.Check size={14} className="text-green-600 shrink-0" />
+                          <span>{item.trim()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Divider */}
+                <ui.Separator className="my-4" />
+
+                {/* Cancellation Policy */}
+                <div className="flex items-start gap-2">
+                  {isCancellable ? (
+                    <ui.Badge variant="outline" className="bg-green-600 text-white border-green-200 hover:bg-green-700 rounded-lg py-1 px-3">
+                      <icons.Check size={16} className="mr-2" />
+                      Free Cancellation Available
+                    </ui.Badge>
+                  ) : (
+                    <ui.Badge variant="outline" className="bg-red-600 text-white border-red-200 hover:bg-red-700 rounded-lg py-1 px-3">
+                      <icons.Info size={16} className="mr-2" />
+                      Non-Refundable
+                    </ui.Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Price Section */}
+              <div className="lg:w-56 bg-linear-to-br from-[#785ef7]/5 to-[#644ed4]/5 p-5 lg:p-6 flex flex-col justify-between border-t lg:border-t-0 lg:border-l-2 border-[#785ef7]/20 shrink-0">
+
+                {/* Price */}
+                <div className="flex-1 flex flex-col justify-center">
+                  <div className="text-right mb-6">
+                    <p className="text-xs text-gray-600 mb-2 font-medium">Per Night Price</p>
+                    <div className="flex items-baseline justify-end gap-2 mb-2">
+                      <span className="text-2xl font-bold bg-linear-to-r from-[#785ef7] to-[#644ed4] bg-clip-text text-transparent">
+                        ₹{Math.round(perNightFare).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Excluding taxes & fees
+                    </p>
+
+                    {/* Total Price Badge */}
+                    <ui.Badge
+                      variant="outline"
+                      className="mt-3 bg-[#785ef7]/10 border-[#785ef7]/20 px-3 py-2 h-auto rounded-xl"
+                    >
+                      <div className="flex flex-col items-end">
+                        <p className="text-xs font-semibold text-gray-700">
+                          Total ({numberOfNights} {numberOfNights > 1 ? 'nights' : 'night'}): <span className="text-[#785ef7] text-base">₹{Math.round(totalPrice).toLocaleString('en-IN')}</span>
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          ₹{Math.round(totalFare).toLocaleString('en-IN')} + ₹{Math.round(totalTax).toLocaleString('en-IN')} tax
+                        </p>
+                      </div>
+                    </ui.Badge>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-3">
+                  {booknow === '0' && (
+                    <ui.Button
+                      onClick={() => onViewPrice(hotel)}
+                      variant="outline"
+                      className="w-full border-2 border-[#785ef7] text-[#785ef7] hover:bg-[#785ef7] hover:text-white font-semibold cursor-pointer"
+                    >
+                      View All Rooms
+                      <icons.ChevronRight className="ml-2 h-4 w-4" />
+                    </ui.Button>
+                  )}
+
+                  {agent_portal === '0' && booknow === '1' && (
+                    <ui.Button
+                      onClick={() => onBookNow(hotel)}
+                      className="w-full bg-linear-to-r from-[#785ef7] to-[#644ed4] hover:from-[#644ed4] hover:to-[#785ef7] text-white font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer"
+                    >
+                      Book Now
+                      <icons.ChevronRight className="ml-2 h-4 w-4" />
+                    </ui.Button>
+                  )}
+
+                  <div className="flex items-center justify-center gap-2 text-xs text-gray-500 pt-2">
+                    <icons.Building2 size={14} className="text-[#785ef7]" />
+                    <span className="font-medium text-gray-700">{rooms.length} room option{rooms.length > 1 ? 's' : ''} available</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* Price & Actions */}
-        <div className="w-full md:w-1/4 p-3 flex flex-col items-end border-l">
-          <div className="flex mb-3">{renderStars(hotel.HotelRating)}</div>
-
-          <div className="text-right">
-            <p className="text-lg font-semibold">
-              ₹ {lowestFareRoom?.TotalFare ?? 'N/A'}
-            </p>
-            <p className="text-xs">
-              + ₹ {lowestFareRoom?.TotalTax ?? 0} taxes & fees
-            </p>
-          </div>
-
-          <div className="mt-4 flex gap-2">
-            {booknow === '0' && (
-              <button
-                onClick={() => onViewPrice(hotel)}
-                className="bg-purple-600 text-white text-xs px-3 py-1 rounded"
-              >
-                View Price
-              </button>
-            )}
-
-            {agent_portal === '0' && booknow === '1' && (
-              <button
-                onClick={() => onBookNow(hotel)}
-                className="bg-green-600 text-white text-xs px-3 py-1 rounded"
-              >
-                Book Now
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+        </ui.CardContent>
+      </ui.Card>
     </motion.div>
   );
 };

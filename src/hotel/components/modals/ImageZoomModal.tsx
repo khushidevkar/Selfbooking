@@ -57,7 +57,7 @@ export const ImageZoomModal: React.FC<ImageZoomModalProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999] flex items-center justify-center"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-999 flex items-center justify-center"
       >
         {/* Close Button */}
         <button
@@ -105,13 +105,13 @@ export const ImageZoomModal: React.FC<ImageZoomModalProps> = ({
           {/* Thumbnail Strip */}
           <div
             ref={thumbStripRef}
-            className="flex gap-2 overflow-x-auto px-4 py-2 w-full max-w-[90vw] scrollbar-hide"
+            className="flex gap-2 overflow-x-auto px-4 py-2 w-full max-w-[90vw] scrollbar-hide custom-scrollbar"
             style={{ scrollBehavior: "smooth" }}
           >
             {safeImages.map((thumb, i) => (
               <img
                 key={i}
-                ref={(el) => (thumbRefs.current[i] = el)}
+                ref={(el) => {thumbRefs.current[i] = el;}}
                 src={thumb}
                 onClick={() => onThumbnailClick(i)}
                 className={`h-16 w-24 object-cover rounded-lg cursor-pointer transition-all ${

@@ -1,10 +1,7 @@
 
 import React from 'react';
-// import DatePicker from 'react-datepicker';
-// import { DayPicker } from 'react-day-picker';
 import { CompanyDropdown, CityDropdown, DateSelector, RoomsGuestsSelector } from './index'
-import { hotelTypes,ui } from '@/index';
-
+import { hotelTypes, ui } from '@/index';
 
 interface SearchHeaderProps {
   company: string;
@@ -14,6 +11,7 @@ interface SearchHeaderProps {
   setShowDropdown: (val: boolean) => void;
   fetchCompanies: () => void;
   loading: boolean;
+  companiesLoading: boolean;
 
   city: string;
   setCity: (val: string) => void;
@@ -23,6 +21,7 @@ interface SearchHeaderProps {
   fetchCities: () => void;
   selectedCityCode: string;
   setSelectedCityCode: (val: string) => void;
+  citiesLoading: boolean;
 
   checkInDate: Date | null;
   setCheckInDate: (date: Date | null) => void;
@@ -33,7 +32,6 @@ interface SearchHeaderProps {
   setCheckOutDate: (date: Date | null) => void;
   isCheckOutOpen: boolean;
   setCheckOutIsOpen: (val: boolean) => void;
-
 
   roomCount: number;
   roomadultCount: number;
@@ -52,12 +50,12 @@ interface SearchHeaderProps {
 
 export const SearchHeader: React.FC<SearchHeaderProps> = (props) => {
   return (
-    <header className="px-2 bg-[#281f55] p-4 max-w-350 mx-auto mt-13.25 sticky top-2 z-10 shadow-md rounded-md
-" id="widgetHeader">
+    <header className="bg-linear-to-r from-[#785ef7] to-[#644ed4] px-2 py-4 md:mt-13.25 max-w-full w-full mx-auto sticky top-0 z-50 shadow-xl border-b-4 border-[#785ef7]/30">
       <form onSubmit={props.handleSubmitForm}>
-        <div id="search-widget" className="hsw v2">
+        <div className="max-w-7xl mx-auto">
           <div className="px-2">
-            <div className="relative grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+            {/* Search Form Grid */}
+            <div className="relative grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
 
               {/* Company Dropdown */}
               <CompanyDropdown
@@ -67,7 +65,8 @@ export const SearchHeader: React.FC<SearchHeaderProps> = (props) => {
                 showDropdown={props.showDropdown}
                 setShowDropdown={props.setShowDropdown}
                 fetchCompanies={props.fetchCompanies}
-                loading={props.loading}
+                loading={props.companiesLoading}
+                
               />
 
               {/* City Dropdown */}
@@ -79,7 +78,7 @@ export const SearchHeader: React.FC<SearchHeaderProps> = (props) => {
                 setShowDropdown2={props.setShowDropdown2}
                 fetchCities={props.fetchCities}
                 setSelectedCityCode={props.setSelectedCityCode}
-                loading={props.loading}
+                loading={props.citiesLoading}
               />
 
               {/* Check-in Date */}
@@ -92,6 +91,7 @@ export const SearchHeader: React.FC<SearchHeaderProps> = (props) => {
                 minDate={new Date()}
               />
 
+              {/* Check-out Date */}
               <DateSelector
                 label="CHECK-OUT DATE"
                 date={props.checkOutDate}
@@ -100,7 +100,6 @@ export const SearchHeader: React.FC<SearchHeaderProps> = (props) => {
                 onChange={(date) => props.setCheckOutDate(date)}
                 minDate={props.checkInDate || new Date()}
               />
-
 
               {/* Rooms & Guests */}
               <RoomsGuestsSelector
@@ -116,19 +115,14 @@ export const SearchHeader: React.FC<SearchHeaderProps> = (props) => {
                 handleApply={props.handleApply}
               />
 
-              {/* <button className="bg-[#785ef7] text-white px-9 py-2 rounded-lg
-font-bold text-base w-40 mx-auto
-shadow-md hover:bg-[#6b52e0] transition
- ">
-                Search
-              </button> */}
-                <div className="flex items-end">
+              {/* Search Button */}
+              <div className="flex items-end">
                 <ui.Button 
                   onClick={(e) => {
                     e.preventDefault();
                     props.handleSubmitForm(e as any);
                   }}
-                  className="w-full h-11 bg-[#785ef7] hover:bg-[#644ed4] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+                  className="w-full h-11 bg-white text-[#785ef7] font-bold rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-200 border-2 border-white/20 hover:scale-[1.02]"
                 >
                   Search
                 </ui.Button>

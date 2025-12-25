@@ -1,10 +1,14 @@
 
+// src/hooks/useHotelShare.ts
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 import { hotelTypes, hotelUtils, hotelApi } from '@/index';
 
-export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams) => {
-  const [selectedRooms, setSelectedRooms] = useState<any[]>([]);
+export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams | null) => {
+  // FIX: Handle null searchParams
+  
+  // const [selectedRooms, setSelectedRooms] = useState<any[]>([]);
+  const [selectedRooms, setSelectedRooms] = useState<hotelTypes.SelectedRoom[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -16,11 +20,12 @@ export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams) => {
 
   const [errors, setErrors] = useState<hotelTypes.ShareFormErrors>({});
 
+  //  FIX: Safely access searchParams properties with fallbacks
   const [formData, setFormData] = useState<hotelTypes.ShareFormData>({
-    clientName: searchParams.corporate_name || '',
-    spocName: searchParams.spoc_name || '',
+    clientName: searchParams?.corporate_name || '',
+    spocName: searchParams?.spoc_name || '',
     spocEmail: hotelUtils.cleanEmails(
-      [searchParams.approver1, searchParams.approver2]
+      [searchParams?.approver1, searchParams?.approver2]
         .filter((e) => e)
         .join(', ')
     ),
@@ -174,12 +179,15 @@ export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams) => {
     }
   };
 
+
+  
   // Prepare share options
-  const prepareShareOptions = () => {
+  const prepareShareOptions = (): hotelTypes.ShareOption[] => {
     if (!selectedRooms || selectedRooms.length === 0) return [];
 
     const grouped = Object.values(
-      selectedRooms.reduce((acc: any, room) => {
+      selectedRooms.reduce<Record<string, hotelTypes.ShareOption>>(
+        (acc, room) => {
         const hotelCode = room.HotelCode;
         const key = hotelCode;
 
@@ -199,7 +207,7 @@ export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams) => {
           RoomType: Array.isArray(room.Name) ? room.Name[0] : room.Name,
           MealPlan: room.MealType || null,
           BaseFare: room.DayRates
-            ? JSON.stringify(room.DayRates.flat().map((d: any) => d.BasePrice))
+            ? JSON.stringify(room.DayRates.flat().map((d) => d.BasePrice))
             : null,
           TotalFare: Number(room.TotalFare || 0),
           Tax: Number(room.TotalTax || 0),
@@ -215,13 +223,24 @@ export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams) => {
   // Handle share button click
   const handleShareOptions = () => {
     if (!selectedRooms || selectedRooms.length === 0) return;
-
     setIsModalOpen(true);
   };
 
   // Submit share form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    //  FIX: Guard against null searchParams
+    if (!searchParams) {
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Search parameters not available',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     const shareOptions = prepareShareOptions();
@@ -237,11 +256,7 @@ export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams) => {
       checkin_date: searchParams.checkIn,
       checkout_date: searchParams.checkOut,
       no_of_seats: searchParams.Adults || 2,
-      city:
-        searchParams.City_name ||
-        (searchParams.filteredCities?.length > 0
-          ? searchParams.filteredCities[0].Name
-          : ''),
+      city: searchParams.city_name || '',
     };
 
     try {
@@ -255,8 +270,7 @@ export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams) => {
         await Swal.fire({
           title: 'Mail Sent',
           text: 'Mail Sent Successfully',
-          imageUrl:
-            'https://cdn-icons-png.flaticon.com/512/845/845646.png',
+          imageUrl: 'https://cdn-icons-png.flaticon.com/512/845/845646.png',
           imageWidth: 75,
           imageHeight: 75,
           confirmButtonText: 'OK',
@@ -292,7 +306,8 @@ export const useHotelShare = (searchParams: hotelTypes.HotelSearchParams) => {
   };
 
   // Add room to selected list
-  const addRoom = (room: any) => {
+  // const addRoom = (room: any) => {
+  const addRoom = (room: hotelTypes.SelectedRoom) => {
     setSelectedRooms((prev) => [...prev, room]);
   };
 

@@ -17,4 +17,7 @@ export const getHotelDetails = (codes: string) =>
 
 export const getCities = () =>
     hotelAxios.post("/getAllCities");
+
+export const shareHotelOptions = (payload: unknown) => 
+  hotelAxios.post("/addsbthoteloptions", payload);
  

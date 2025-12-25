@@ -1,27 +1,27 @@
 
-import { X, Share2 } from 'lucide-react';
-import '../../styles/scrollbar.css';
+import {hotelTypes, icons, ui } from '@/index';
 
-
-interface SharePanelProps {
-  selectedRooms: any[];
+interface SharePanelModalProps {
+  selectedRooms?: hotelTypes.SelectedRoom[];
   onClose: () => void;
   onShare: () => void;
   onRemoveRoom: (bookingCode: string) => void;
   extractAttraction: (description: string) => string;
 }
 
-export const SharePanel: React.FC<SharePanelProps> = ({
-  selectedRooms,
+export const SharePanelModal: React.FC<SharePanelModalProps> = ({
+  selectedRooms = [],
   onClose,
   onShare,
   onRemoveRoom,
   extractAttraction
 }) => {
-  if (selectedRooms.length === 0) return null;
+  // Safety check - return null if no rooms selected
+  if (!selectedRooms || selectedRooms.length === 0) return null;
 
   const groupedHotels = Object.values(
-    selectedRooms.reduce((acc: any, room) => {
+    // selectedRooms.reduce((acc: any, room) => {
+    selectedRooms.reduce<Record<string, hotelTypes.GroupedHotel>>((acc, room) => {
       const key = room.HotelCode + "_" + room.HotelName + "_" + (room.CityName || "");
       if (!acc[key]) {
         acc[key] = {
@@ -38,23 +38,26 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   );
 
   return (
-    <div className="fixed bottom-0 right-0 m-2 bg-white rounded-lg shadow-xl border border-gray-200 sm:w-80 md:w-85 max-h-[60vh] flex flex-col overflow-hidden z-50 custom-scrollbar">
-      
-
+    <div className="fixed bottom-0 right-0 m-2 bg-white rounded-lg shadow-xl border border-gray-200 sm:w-80 md:w-85 max-h-[60vh] flex flex-col overflow-hidden z-9998 custom-scrollbar">
       {/* Header */}
       <div className="flex bg-[#785ef7] px-3 py-2 items-center justify-between">
         <h3 className="text-xs font-semibold text-white">Selected Hotels / Rooms</h3>
         <button
-          className="text-white/80 hover:text-white hover:bg-white/10 rounded p-1 transition-all"
-          onClick={onClose}
+          className="text-white/80 hover:text-white hover:bg-white/10 rounded p-1 cursor-pointer transition-all"
+          onClick={(e) => {
+            console.log('Close button clicked!');
+            e.stopPropagation();
+            onClose?.();
+          }}
+          style={{ pointerEvents: 'auto' }}
         >
-          <X className="w-3.5 h-3.5" />
+          <icons.X className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 custom-scrollbar">
-        {groupedHotels.map((hotelGroup: any, index: number) => (
+        {groupedHotels.map((hotelGroup, index: number) => (
           <div key={index} className="bg-gray-50 rounded-md border border-gray-200 p-2">
             {/* Hotel Header */}
             <div className="flex items-start gap-2 mb-2">
@@ -69,16 +72,13 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 </h4>
                 <p className="text-xs text-gray-600 truncate mt-0.5">
                   {hotelGroup.CityName || "No City Available"}
-                  {hotelGroup.Description && (
-                    <span className="text-gray-500"> | {extractAttraction(hotelGroup.Description)}</span>
-                  )}
                 </p>
               </div>
             </div>
 
             {/* Rooms List */}
             <div className="space-y-1.5 pl-8">
-              {hotelGroup.rooms.map((room: any, rIndex: number) => (
+              {hotelGroup.rooms.map((room, rIndex: number) => (
                 <div
                   key={rIndex}
                   className="flex items-center justify-between gap-2 bg-white rounded border border-gray-100 p-2 hover:border-[#785ef7] transition-colors group"
@@ -96,7 +96,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                       onClick={() => onRemoveRoom(room.BookingCode)}
                       className="w-5 h-5 flex items-center justify-center rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <icons.X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -115,19 +115,23 @@ export const SharePanel: React.FC<SharePanelProps> = ({
 
       {/* Footer */}
       <div className="bg-gray-50 border-t border-gray-200 px-3 py-2">
-        <button
+        <ui.Button
           type="button"
-          className="w-full bg-[#785ef7] hover:bg-[#6b4ee6] text-white font-semibold py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 text-xs"
-          onClick={onShare}
+          className="w-full bg-linear-to-r from-[#785ef7] to-[#6b4ee6] hover:from-[#6b4ee3] hover:to-[#5a3ec8] text-white font-semibold py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 text-xs h-auto"
+          onClick={(e) => {
+            console.log('Share button clicked!');
+            e.stopPropagation();
+            onShare();
+          }}
         >
-          <Share2 className="w-3.5 h-3.5" />
+          <icons.Share2 className="w-3.5 h-3.5" />
           Share hotel options
           {selectedRooms.length > 0 && (
             <span className="bg-white/20 text-xs px-1.5 py-0.5 rounded-full ml-1">
               {selectedRooms.length}
             </span>
           )}
-        </button>
+        </ui.Button>
       </div>
     </div>
   );

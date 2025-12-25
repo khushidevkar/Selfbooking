@@ -1,140 +1,233 @@
 
-import { useState, useRef, useMemo } from 'react';
+// src/hooks/useHotelBootstrap.ts
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { hotelApi, peopleApi, hotelTypes, hotelUtils, formTypes } from '@/index';
 
-import Swal from 'sweetalert2';
-
-import { hotelApi, peopleApi, hotelTypes,hotelUtils } from '@/index';
 export const useHotelBootstrap = () => {
   const [loader, setLoader] = useState(false);
-  const [loading, setLoading] = useState(false);
+   const [companiesLoading, setCompaniesLoading] = useState(false);
+  const [citiesLoading, setCitiesLoading] = useState(false);
+
   const [hotelDetails, setHotelDetails] = useState<hotelTypes.Hotel[]>(() => {
     const storedData = sessionStorage.getItem('hotelDetails');
     return storedData ? JSON.parse(storedData) : [];
   });
 
-  const searchParams: hotelTypes.HotelSearchParams =
-    JSON.parse(sessionStorage.getItem('hotelData_header') || '{}');
 
-  const hotelData = JSON.parse(sessionStorage.getItem('hotelSearchData') || '{}');
+   const [searchParams, setSearchParams] = useState<hotelTypes.HotelSearchParams | null>(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    return storedParams ? JSON.parse(storedParams) : null;
+  });
+
+
+  // const [hotelSearchData, setHotelSearchData] = useState(() =>
+  //   JSON.parse(sessionStorage.getItem('hotelSearchData') || '{}')
+  // );
+
+  const [hotelSearchData, setHotelSearchData] = useState<{ hotelcityList?: hotelTypes.HotelSearchItem[] }>(() =>
+  JSON.parse(sessionStorage.getItem('hotelSearchData') || '{}')
+);
+
+
+  // const combinedHotels = useMemo(() => {
+  //   const hotelcityList: hotelTypes.HotelCityItem[] = hotelSearchData.hotelcityList ?? [];
+  //   return hotelDetails.map((hotel) => {
+  //     const matchedHotel = hotelcityList.find(
+  //       (item) => item.HotelCode === hotel.HotelCode
+  //     );
+  //     return {
+  //       ...hotel,
+  //       ...(matchedHotel ?? {}),
+  //     };
+  //   });
+  // }, [hotelDetails, hotelSearchData]);
+
   const combinedHotels = useMemo(() => {
-    const hotelcityList: hotelTypes.HotelCityItem[] = hotelData.hotelcityList ?? [];
+  const hotelcityList: hotelTypes.HotelSearchItem[] = hotelSearchData.hotelcityList ?? [];
+  
+  return hotelDetails.map((hotel) => {
+    const matchedHotel = hotelcityList.find(
+      (item) => item.HotelCode === hotel.HotelCode
+    );
+    
+    return {
+      ...hotel,
+      ...matchedHotel,
+      // Explicitly preserve Rooms from search results (has pricing)
+      Rooms: matchedHotel?.Rooms || hotel.Rooms || [],
+    };
+  });
+}, [hotelDetails, hotelSearchData]);
 
-    return hotelDetails.map((hotel) => {
-      const matchedHotelList = hotelcityList.find(
-        (item: hotelTypes.HotelCityItem) => item.HotelCode === hotel.HotelCode
-      );
 
-      const matchedHotelData =
-        (hotelData[hotel.HotelCode] as Record<string, unknown>) ?? {};
-
-      return {
-        ...hotel,
-        ...(matchedHotelList ?? {}),
-        ...matchedHotelData,
-      };
-    });
-  }, [hotelDetails, hotelData]);
-
+useEffect(() => {
+  if (combinedHotels.length > 0) {
+    console.log('=== COMBINED HOTELS CHECK ===');
+    console.log('Total hotels:', combinedHotels.length);
+    console.log('First hotel:', combinedHotels[0]);
+    console.log('First hotel Rooms:', combinedHotels[0]?.Rooms);
+    console.log('Rooms count:', combinedHotels[0]?.Rooms?.length);
+  }
+}, [combinedHotels]);
 
   // Cities
-  const [cities, setCities] = useState<hotelTypes.City[]>([]);
-  const [city, setCity] = useState(
-    searchParams.filteredCities?.[0]?.Name || searchParams.City_name
-  );
-  const [selectedCityCode, setSelectedCityCode] = useState(
-    searchParams.filteredCities?.[0]?.tbo_city_code || ''
-  );
+  const [cities, setCities] = useState<formTypes.City[]>([]);
+
+  
+    const [city, setCity] = useState(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.city_name || '';
+    }
+    return '';
+  });
+
+
+
+   const [selectedCityCode, setSelectedCityCode] = useState(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.CityCode || '';
+    }
+    return '';
+  });
+
   const [showDropdown2, setShowDropdown2] = useState(false);
 
   // Companies
   const [companies, setCompanies] = useState<string[]>([]);
-  const [company, setCompany] = useState(searchParams.corporate_name || '');
+
+  
+   const [company, setCompany] = useState(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.corporate_name || '';
+    }
+    return '';
+  });
+
   const [showDropdown, setShowDropdown] = useState(false);
 
   // Dates
- const [checkInDate, setCheckInDate] = useState<Date | null>(
-  searchParams.checkIn ? new Date(searchParams.checkIn) : null
-);
-const [checkOutDate, setCheckOutDate] = useState<Date | null>(
-  searchParams.checkOut ? new Date(searchParams.checkOut) : null
-);
 
+   const [checkInDate, setCheckInDate] = useState<Date | null>(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.checkIn ? new Date(params.checkIn) : null;
+    }
+    return null;
+  });
+
+   const [bookNow, setBookNow] = useState(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.booknow || '';
+    }
+    return null;
+  });
+  
+  const [checkOutDate, setCheckOutDate] = useState<Date | null>(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.checkOut ? new Date(params.checkOut) : null;
+    }
+    return null;
+  });
 
   const [isCheckInOpen, setCheckInIsOpen] = useState(false);
   const [isCheckOutOpen, setCheckOutIsOpen] = useState(false);
 
   // Rooms & Guests
-  const [roomCount, setRoomCount] = useState(searchParams.Rooms || 1);
-  const [roomadultCount, setRoomAdultCount] = useState(searchParams.Adults || 2);
-  const [roomchildCount, setRoomChildCount] = useState(searchParams.Children || 0);
-  const [childrenAges, setChildrenAges] = useState<number[]>(
-    searchParams.ChildAge || []
-  );
+
+   const [roomCount, setRoomCount] = useState(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.Rooms || 1;
+    }
+    return 1;
+  });
+
+  
+   const [roomadultCount, setRoomAdultCount] = useState(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.Adults || 1;
+    }
+    return 1;
+  });
+
+  
+    const [roomchildCount, setRoomChildCount] = useState(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.Children || 0;
+    }
+    return 0;
+  });
+  
+  
+  const [childrenAges, setChildrenAges] = useState<number[]>(() => {
+    const storedParams = sessionStorage.getItem('hotelData_header');
+    if (storedParams) {
+      const params = JSON.parse(storedParams);
+      return params.ChildAge || [];
+    }
+    return [];
+  });
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const isFetchCitysCalled = useRef(false);
+  // -----------------------------
+  // Helper Functions
+  // -----------------------------
 
-  // const fetchCompanies = async () => {
-  //   try {
-  //     const companyList = await peopleApi.getCompanies();
-  //     setCompanies(companyList);
-  //   } catch (error) {
-  //     console.error('Fetch Error:', error);
-  //   }
-  // };
+  const buildRoomsArray = useCallback((
+    adults: number,
+    children: number,
+    childrenAges: number[]
+  ) => {
+    let remainingAdults = adults;
+    let remainingChildren = children;
+    let remainingChildrenAges = [...childrenAges];
 
+    const roomsArray: { Adults: number; Children: number; ChildrenAges: number[] | null }[] = [];
+    const maxAdultsPerRoom = 8;
+    const maxChildrenPerRoom = 4;
 
+    while (remainingAdults > 0 || remainingChildren > 0) {
+      const allocatedAdults = Math.min(remainingAdults, maxAdultsPerRoom);
+      const allocatedChildren = Math.min(remainingChildren, maxChildrenPerRoom);
+      const allocatedChildrenAges = remainingChildrenAges.slice(0, allocatedChildren);
 
-  const fetchCompanies = async () => {
-    setLoading(true);
-    try {
-      const response = await peopleApi.getCompanies();
+      roomsArray.push({
+        Adults: allocatedAdults,
+        Children: allocatedChildren,
+        ChildrenAges: allocatedChildrenAges.length > 0 ? allocatedChildrenAges : null,
+      });
 
-      if (
-        response.data.success === "1" &&
-        Array.isArray(response.data.response.Companies)
-      ) {
-        setCompanies(
-          response.data.response.Companies.map(
-            (c: { corporate_name: string }) => c.corporate_name
-          )
-        );
-      } else {
-        console.error("API Error: No companies found or invalid response format");
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error);
-    } finally {
-      setLoading(false);
+      remainingAdults -= allocatedAdults;
+      remainingChildren -= allocatedChildren;
+      remainingChildrenAges = remainingChildrenAges.slice(allocatedChildren);
     }
-  };
 
+    return roomsArray;
+  }, []);
 
-  const fetchCities = async () => {
-    try {
-      const response = await hotelApi.getCities();
-      const data = response.data; // actual API response
+  // -----------------------------
+  // API Functions
+  // -----------------------------
 
-      if (data.success === '1' && Array.isArray(data.response?.Cities)) {
-        setCities(data.response.Cities);
-      } else {
-        await Swal.fire({
-          title: 'Error!',
-          text: data?.Status?.Description || 'Something went wrong!',
-          imageWidth: 75,
-          imageHeight: 75,
-          confirmButtonText: 'OK',
-        });
-      }
-    } catch (error) {
-      console.error('Fetch Error:', error);
-    }
-  };
-
-
-
-  const handleSelection = (
+  const handleSelection = useCallback((
     type: 'adults' | 'children' | 'rooms',
     value: number
   ) => {
@@ -174,15 +267,15 @@ const [checkOutDate, setCheckOutDate] = useState<Date | null>(
     } else {
       setErrorMessage('');
     }
-  };
+  }, [roomadultCount, roomchildCount, roomCount]);
 
-  const handleChildAgeChange = (index: number, age: number) => {
+  const handleChildAgeChange = useCallback((index: number, age: number) => {
     const updatedAges = [...childrenAges];
     updatedAges[index] = age;
     setChildrenAges(updatedAges);
-  };
+  }, [childrenAges]);
 
-  const handleApply = () => {
+  const handleApply = useCallback(() => {
     const totalAdults = parseInt(String(roomadultCount)) || 0;
     const totalChildren = parseInt(String(roomchildCount)) || 0;
     const selectedRooms = parseInt(String(roomCount)) || 0;
@@ -203,209 +296,197 @@ const [checkOutDate, setCheckOutDate] = useState<Date | null>(
 
     setErrorMessage('');
     setIsDropdownOpen(false);
-  };
+  }, [roomadultCount, roomchildCount, roomCount, childrenAges]);
 
+  const fetchCompanies = useCallback(async () => {
+     if (companies.length > 0) return;
+    
+    setCompaniesLoading(true);
+    try {
+      const response = await peopleApi.getCompanies<formTypes.CompaniesApiResponse>();
+      if (response.data.success === '1' && Array.isArray(response.data.response.Companies)) {
+        setCompanies(response.data.response.Companies.map((c: { corporate_name: string }) => c.corporate_name));
+      } else {
+        throw new Error('Failed to fetch companies');
+      }
+    } catch (error: unknown) {
+      console.error('Fetch Companies Error:', error);
+      throw error;
+    } finally {
+      setCompaniesLoading(false);
+    }
 
+  }, [companies.length]);
 
-  const fetchSearchApi = async (hotelCodes: string[]) => {
-  if (!hotelCodes || hotelCodes.length < 3) {
-    console.warn("Skipping search: Not enough hotel codes.");
-    return;
-  }
+  const fetchCities = useCallback(async () => {
+      if (cities.length > 0) return;
+    
+    setCitiesLoading(true);
+    try {
+      const response = await hotelApi.getCities();
+      const data = response.data;
+      if (data.success === '1' && Array.isArray(data.response?.Cities)) {
+        setCities(data.response.Cities);
+      } else {
+        throw new Error(data?.Status?.Description || 'Failed to fetch cities');
+      }
+    } catch (error: unknown) {
+      console.error('Fetch Cities Error:', error);
+      throw error;
+    }finally {
+      setCitiesLoading(false);
+    }
+  }, [cities.length]);
 
-  if (!checkInDate || !checkOutDate) {
-    console.error("Check-in or check-out date missing");
-    return;
-  }
+  // -----------------------------
+  // Complete initialization and search flow
+  // -----------------------------
+  
 
-  const formattedCheckInDate = checkInDate.toISOString().split("T")[0];
-  const formattedCheckOutDate = checkOutDate.toISOString().split("T")[0];
+const initializeAndSearch = useCallback(async (params: hotelTypes.HotelSearchParams) => {
+  setLoader(true);
+  
+  try {
+    // Step 1: Set all state from params
+    setSearchParams(params);
+    setCity(params.city_name || '');
+    setSelectedCityCode(params.CityCode || '');
+    if (params.checkIn) setCheckInDate(new Date(params.checkIn));
+    if (params.checkOut) setCheckOutDate(new Date(params.checkOut));
+    setRoomCount(params.Rooms || 1);
+    setRoomAdultCount(params.Adults || 1);
+    setRoomChildCount(params.Children || 0);
+    setChildrenAges(params.ChildAge || []);
 
-  let remainingAdults = roomadultCount;
-  let remainingChildren = roomchildCount;
-  let remainingChildrenAges = [...childrenAges];
+    // Step 2: Validate params before proceeding
+    if (!params.CityCode?.trim()) {
+      throw new Error('City code is required');
+    }
+    
+    if (!params.checkIn || !params.checkOut) {
+      throw new Error('Check-in and check-out dates are required');
+    }
 
-  const roomsArray: {
-    Adults: number;
-    Children: number;
-    ChildrenAges: number[] | null;
-  }[] = [];
+    // Step 3: Fetch hotel codes
+    const codesResponse = await hotelApi.getHotelCodes(params.CityCode.trim());
+    const codesData = codesResponse.data;
 
-  const maxAdultsPerRoom = 8;
-  const maxChildrenPerRoom = 4;
+    if (codesData.Status?.Code !== 200) {
+      throw new Error(codesData.Status?.Description || 'Failed to fetch hotel codes');
+    }
 
-  while (remainingAdults > 0 || remainingChildren > 0) {
-    const allocatedAdults = Math.min(remainingAdults, maxAdultsPerRoom);
-    const allocatedChildren = Math.min(remainingChildren, maxChildrenPerRoom);
+    const hotels = codesData.Hotels ?? [];
+    if (!hotels.length) {
+      throw new Error('No hotels found for this city');
+    }
 
-    const allocatedChildrenAges = remainingChildrenAges.slice(
-      0,
-      allocatedChildren
+    // Step 4: Search hotels with the codes
+    const codes = hotels.map((h: { HotelCode: string}) => h.HotelCode);
+    
+    const formattedCheckInDate = new Date(params.checkIn).toISOString().split('T')[0];
+    const formattedCheckOutDate = new Date(params.checkOut).toISOString().split('T')[0];
+
+    const roomsArray = buildRoomsArray(
+      params.Adults || 1,
+      params.Children || 0,
+      params.ChildAge || []
     );
 
-    roomsArray.push({
-      Adults: allocatedAdults,
-      Children: allocatedChildren,
-      ChildrenAges:
-        allocatedChildrenAges.length > 0 ? allocatedChildrenAges : null,
-    });
+    const requestBody = {
+      CheckIn: formattedCheckInDate,
+      CheckOut: formattedCheckOutDate,
+      HotelCodes: codes.toString(),
+      GuestNationality: 'IN',
+      PaxRooms: roomsArray,
+      ResponseTime: 23.0,
+      IsDetailedResponse: true,
+      Filters: {
+        Refundable: false,
+        NoOfRooms: roomsArray.length,
+        MealType: 0,
+        OrderBy: 0,
+        StarRating: 0,
+        HotelName: null,
+      },
+    };
 
-    remainingAdults -= allocatedAdults;
-    remainingChildren -= allocatedChildren;
-    remainingChildrenAges = remainingChildrenAges.slice(allocatedChildren);
-  }
-
-  const requestBody = {
-    CheckIn: formattedCheckInDate,
-    CheckOut: formattedCheckOutDate,
-    HotelCodes: hotelCodes.toString(),
-    GuestNationality: "IN",
-    PaxRooms: roomsArray,
-    ResponseTime: 23.0,
-    IsDetailedResponse: true,
-    Filters: {
-      Refundable: false,
-      NoOfRooms: roomsArray.length,
-      MealType: 0,
-      OrderBy: 0,
-      StarRating: 0,
-      HotelName: null,
-    },
-  };
-
-  try {
     const response = await hotelApi.searchHotels(requestBody);
-    const data = response.data; // ✅ ACTUAL API RESPONSE
+    const data = response.data;
 
-    if (data.Status?.Code === 200) {
-      const hotels = data.HotelResult ?? [];
+    if (data.Status?.Code !== 200) {
+      throw new Error(data.Status?.Description || 'Hotel search failed');
+    }
 
-      const hotelCodesForDetails = hotels
-        .map((hotel: hotelTypes.HotelSearchItem) => hotel.HotelCode?.toString())
-        .filter((code: string | undefined): code is string => Boolean(code));
+    // Step 5: Fetch and store hotel details
 
-      if (!isFetchCitysCalled.current && hotelCodesForDetails.length > 0) {
-        isFetchCitysCalled.current = true;
-        await fetchCitys(hotelCodesForDetails);
+    const searchHotels = data.HotelResult ?? [];
+    
+    const hotelCodesForDetails = searchHotels
+      .map((h: { HotelCode?: string}) => h.HotelCode?.toString())
+      .filter(Boolean);
+
+    //  FIX: Add proper error handling for hotel details
+    if (hotelCodesForDetails.length > 0) {
+      const detailsResponse = await hotelApi.getHotelDetails(
+        hotelCodesForDetails.join(',')
+      );
+
+      const detailsData = detailsResponse.data;
+      console.log("HotelDetails API response:", detailsData);
+
+      // Check for success and throw error if failed
+      if (detailsData.Status?.Code !== 200) {
+        throw new Error(
+          detailsData.Status?.Description || 'Failed to fetch hotel details'
+        );
       }
 
-      sessionStorage.setItem(
-        "hotelSearchData",
-        JSON.stringify({ hotelcityList: hotels })
-      );
-    } else if (data.Status?.Code === 201) {
-      setLoader(false);
-      await Swal.fire({
-        title: "Error!",
-        text: data.Status?.Description || "Something went wrong!",
-        imageWidth: 75,
-        imageHeight: 75,
-        confirmButtonText: "OK",
-      });
-    }
-  } catch (error) {
-    console.error("Error fetching hotels:", error);
-    setLoader(false);
-  }
-};
-
-
-  const fetchCitys = async (hotelCodes: string[]) => {
-  if (!Array.isArray(hotelCodes)) {
-    console.error("Invalid hotel codes format - expected array");
-    return;
-  }
-
-  const validCodes = hotelCodes
-    .map((code) => code.toString())
-    .filter((code): code is string => Boolean(code));
-
-  if (validCodes.length === 0) {
-    console.warn("No valid hotel codes to fetch details for");
-    return;
-  }
-
-  const codesString = validCodes.join(",");
-
-  try {
-    const response = await hotelApi.getHotelDetails(codesString);
-    const data = response.data; // ACTUAL API RESPONSE
-
-    setLoader(false);
-
-    if (data.Status?.Code === 200) {
-      const hotelDetails = data.response?.HotelDetails ?? [];
-
-      setHotelDetails(hotelDetails);
-
-      sessionStorage.setItem(
-        "hotelDetails",
-        JSON.stringify(hotelDetails)
-      );
-    } else {
-      await Swal.fire({
-        title: "Error!",
-        text: data.Status?.Description || "Something went wrong!",
-        imageWidth: 75,
-        imageHeight: 75,
-        confirmButtonText: "OK",
-      });
-    }
-  } catch (error) {
-    console.error("Error fetching hotel details:", error);
-    setLoader(false);
-  }
-};
-
-const handleSubmitForm = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  if (errorMessage) {
-    console.warn("Form contains errors, submission stopped.");
-    return;
-  }
-
-  setLoader(true);
-
-  if (!selectedCityCode) {
-    console.error("City code not selected!");
-    setLoader(false);
-    return;
-  }
-
-  try {
-    const response = await hotelApi.getHotelCodes(selectedCityCode);
-    const data: hotelTypes.HotelCodesResponse = response.data; //ACTUAL API RESPONSE
-
-    if (data.Status?.Code === 200) {
-      const hotels = data.Hotels ?? [];
+      const details = detailsData.HotelDetails ?? [];
       
-      if (hotels.length > 0) {
-        const codes = hotels.map((hotel: hotelTypes.HotelApiItem) => hotel.HotelCode);
-        await fetchSearchApi(codes);
-      } else {
-        console.warn("No hotels found in response.");
-        setLoader(false);
+      // Optional: Validate that we got details
+      if (details.length === 0) {
+        throw new Error('No hotel details returned from API');
       }
+
+      setHotelDetails(details);
+      sessionStorage.setItem("hotelDetails", JSON.stringify(details));
     } else {
-      await Swal.fire({
-        title: "Error!",
-        text: data.Status?.Description || "Something went wrong!",
-        imageWidth: 75,
-        imageHeight: 75,
-        confirmButtonText: "OK",
-      });
-      setLoader(false);
+      // Handle case where no hotel codes were found
+      throw new Error('No hotel codes available for fetching details');
     }
-  } catch (error) {
-    console.error("Error fetching hotels:", error);
+
+    // Step 6: Store search results
+    const payload = { hotelcityList: searchHotels };
+    sessionStorage.setItem('hotelSearchData', JSON.stringify(payload));
+    setHotelSearchData(payload);
+
+    return { success: true };
+    
+  } catch (error: unknown) {
+    console.error('Hotel initialization error:', error);
+    //  Make sure error is re-thrown so useHotelInitializer can catch it
+    throw error;
+  } finally {
     setLoader(false);
   }
-};
+}, [buildRoomsArray]);
 
+
+
+  // Keep the original handleSubmitForm for manual searches (uses state)
+  const handleSubmitForm = useCallback(async () => {
+    if (!searchParams) {
+      throw new Error('Hotel search not initialized yet');
+    }
+    
+    // Reuse the same logic but with current state
+    await initializeAndSearch(searchParams);
+  }, [searchParams, initializeAndSearch]);
 
   return {
     loader,
+    companiesLoading,
+    citiesLoading,
     hotelDetails,
     combinedHotels,
     searchParams,
@@ -420,6 +501,8 @@ const handleSubmitForm = async (e: React.FormEvent) => {
     company,
     setCompany,
     showDropdown,
+    bookNow, 
+    setBookNow,
     setShowDropdown,
     checkInDate,
     setCheckInDate,
@@ -436,11 +519,12 @@ const handleSubmitForm = async (e: React.FormEvent) => {
     isDropdownOpen,
     setIsDropdownOpen,
     errorMessage,
-    handleSelection,
-    handleChildAgeChange,
-    handleApply,
     handleSubmitForm,
     fetchCompanies,
     fetchCities,
+    handleSelection,
+    handleChildAgeChange,
+    handleApply,
+    initializeAndSearch, //  For URL-based initialization
   };
 };

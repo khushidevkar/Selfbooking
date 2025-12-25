@@ -1,2 +1,6 @@
 export {default as HotelSearchBootstrap} from './HotelSearchBootstrap'
 export {default as HotelSearchPage} from './HotelSearchPage'
+export {default as Home } from './Home'
+export { default as HotelDetailPage} from './HotelDetailPage'
+export {default as HotelBookingPage} from './HotelBookingPage'
+export {default as HotelBookingCompletedPage} from './HotelBookingCompletedPage'

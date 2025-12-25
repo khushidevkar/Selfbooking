@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { hotelTypes, icons , ui } from "@/index";
 interface RoomsGuestsSelectorProps {
   roomCount: number;
@@ -25,149 +25,13 @@ export const RoomsGuestsSelector: React.FC<RoomsGuestsSelectorProps> = ({
   handleChildAgeChange,
   handleApply
 }) => {
-  const [selectSize, setSelectSize] = useState(1);
-  const [adultSize, setAdultSize] = useState(1);
-  const [childSize, setChildSize] = useState(1);
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  // const [selectSize, setSelectSize] = useState(1);
+  // const [adultSize, setAdultSize] = useState(1);
+  // const [childSize, setChildSize] = useState(1);
+  // const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   return (
-    // <div className="bg-white rounded-sm h-12.5 w-full pl-3">
-    //   <div
-    //     className="flex gap-2 cursor-pointer"
-    //     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-    //   >
-    //     <h6 className="text-xs hotel-form-text-color">ROOMS & GUESTS</h6>
-    //     <img
-    //       src="../img/downarrow.svg"
-    //       className="w-3 h-4"
-    //       alt="Down Arrow"
-    //     />
-    //   </div>
-      
-    //   <p className="hotel-city-name-2 font-semibold whitespace-nowrap">
-    //     {roomCount} Rooms, {roomadultCount} Adults, {roomchildCount} Childs
-    //   </p>
-
-    //   {isDropdownOpen && (
-    //     <div className="absolute right-0 bg-white rounded-lg mt-1 p-3 z-10 shadow-lg w-100 max-h-125">
-    //       {/* Rooms Selector */}
-    //       <div className="mb-2 flex items-center justify-between">
-    //         <h6 className="textsizes">Rooms</h6>
-    //         <select
-    //           className="border border-gray-300 px-3 py-1 focus:outline-none"
-    //           value={roomCount}
-    //           size={selectSize}
-    //           onClick={() => setSelectSize(5)}
-    //           onChange={(e) => {
-    //             handleSelection("rooms", parseInt(e.target.value));
-    //             setTimeout(() => setSelectSize(1), 100);
-    //           }}
-    //           onBlur={() => setSelectSize(1)}
-    //         >
-    //           {Array.from({ length: 21 }, (_, i) => i).map((num) => (
-    //             <option key={num} value={num}>
-    //               {num}
-    //             </option>
-    //           ))}
-    //         </select>
-    //       </div>
-
-    //       {errorMessage && (
-    //         <p className="text-red-500 text-xs px-2">{errorMessage}</p>
-    //       )}
-
-    //       {/* Adults Selector */}
-    //       <div className="mb-2 flex items-center justify-between">
-    //         <h6 className="textsizes">Adults</h6>
-    //         <select
-    //           className="border border-gray-300 px-3 py-1 focus:outline-none"
-    //           value={roomadultCount}
-    //           size={adultSize}
-    //           onClick={() => setAdultSize(5)}
-    //           onChange={(e) => {
-    //             handleSelection("adults", parseInt(e.target.value));
-    //             setTimeout(() => setAdultSize(1), 100);
-    //           }}
-    //           onBlur={() => setAdultSize(1)}
-    //         >
-    //           {Array.from({ length: 41 }, (_, i) => i).map((num) => (
-    //             <option key={num} value={num}>
-    //               {num}
-    //             </option>
-    //           ))}
-    //         </select>
-    //       </div>
-
-    //       {/* Children Selector */}
-    //       <div className="mb-2 flex items-center justify-between">
-    //         <div>
-    //           <h6 className="textsizes">Child</h6>
-    //           <p className="text-xs">0-17 yrs</p>
-    //         </div>
-    //         <select
-    //           className="border border-gray-300 px-3 py-1 focus:outline-none"
-    //           value={roomchildCount}
-    //           size={childSize}
-    //           onClick={() => setChildSize(5)}
-    //           onChange={(e) => {
-    //             handleSelection("children", parseInt(e.target.value));
-    //             setTimeout(() => setChildSize(1), 100);
-    //           }}
-    //           onBlur={() => setChildSize(1)}
-    //         >
-    //           {Array.from({ length: 41 }, (_, i) => i).map((num) => (
-    //             <option key={num} value={num}>
-    //               {num}
-    //             </option>
-    //           ))}
-    //         </select>
-    //       </div>
-
-    //       <p className="textcolor">
-    //         Please provide the correct number of children along with their ages for the best options and prices.
-    //       </p>
-    //       <hr className="my-4 border-gray-500" />
-
-    //       {/* Children Ages */}
-    //       {roomchildCount > 0 && (
-    //         <div className="overflow-y-auto grid grid-cols-2 gap-4" style={{ maxHeight: "150px" }}>
-    //           {childrenAges.map((age, index) => (
-    //             <div key={index} className="mb-4 flex items-center gap-4 justify-between">
-    //               <h6 className="textsizes">Child&nbsp;{index + 1}</h6>
-    //               <select
-    //                 className="border border-gray-300 rounded-sm py-1 px-2 w-full focus:outline-none text-xs"
-    //                 value={age === 0 ? 0 : age || ""}
-    //                 size={expandedIndex === index ? 5 : 1}
-    //                 onClick={() => setExpandedIndex(index)}
-    //                 onChange={(e) => {
-    //                   handleChildAgeChange(index, parseInt(e.target.value));
-    //                   setTimeout(() => setExpandedIndex(null), 100);
-    //                 }}
-    //                 onBlur={() => setExpandedIndex(null)}
-    //               >
-    //                 {Array.from({ length: 18 }, (_, i) => i).map((num) => (
-    //                   <option key={num} value={num}>
-    //                     {num === 0 ? "0" : `${num} Yrs`}
-    //                   </option>
-    //                 ))}
-    //               </select>
-    //             </div>
-    //           ))}
-    //         </div>
-    //       )}
-
-    //       <ui.Button
-    //         className="search-ui.Buttonn item-center justify-between"
-    //         style={{ marginLeft: "25%" }}
-    //         onClick={handleApply}
-    //       >
-    //         Apply
-    //       </ui.Button>
-    //     </div>
-    //   )}
-    // </div>
-
-
+  
      <ui.FormField label="Rooms & Guests" icon={icons.Users}>
       <ui.Popover open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <ui.PopoverTrigger asChild>
@@ -189,11 +53,12 @@ export const RoomsGuestsSelector: React.FC<RoomsGuestsSelectorProps> = ({
               <ui.Select 
                 value={String(roomCount)} 
                 onValueChange={(val) => handleSelection("rooms", Number(val))}
+                
               >
                 <ui.SelectTrigger className="w-20">
                   <ui.SelectValue />
                 </ui.SelectTrigger>
-                <ui.SelectContent>
+                <ui.SelectContent className="bg-white h-48">
                   {Array.from({ length: 21 }, (_, i) => i).map((num) => (
                     <ui.SelectItem key={num} value={String(num)}>{num}</ui.SelectItem>
                   ))}

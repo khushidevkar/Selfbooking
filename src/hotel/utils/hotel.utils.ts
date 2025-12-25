@@ -1,60 +1,4 @@
 
-// // src/hotel/utils/hotel.helpers.ts
-
-// import { hotelTypes } from '@/index';
-
-// export const mergeHotelData = (
-//   hotelDetails: hotelTypes.Hotel[],
-//   hotelcityList: any[],
-//   hotelData: Record<string, any>
-// ): hotelTypes.Hotel[] => {
-//   return hotelDetails.map(hotel => {
-//     const matchedHotelList = hotelcityList.find(item => item.HotelCode === hotel.HotelCode);
-//     const matchedHotelData = hotelData[hotel.HotelCode] || {};
-//     return { ...hotel, ...matchedHotelList, ...matchedHotelData };
-//   });
-// };
-
-// // Allocates adults and children into rooms based on max limits
-// export const allocateRooms = (
-//   totalAdults: number,
-//   totalChildren: number,
-//   childrenAges: number[]
-// ) => {
-//   const rooms: any[] = [];
-//   let remainingAdults = totalAdults;
-//   let remainingChildren = totalChildren;
-//   let remainingChildrenAges = [...childrenAges];
-
-//   const maxAdultsPerRoom = 8;
-//   const maxChildrenPerRoom = 4;
-
-//   while (remainingAdults > 0 || remainingChildren > 0) {
-//     const adultsInRoom = Math.min(remainingAdults, maxAdultsPerRoom);
-//     const childrenInRoom = Math.min(remainingChildren, maxChildrenPerRoom);
-//     const childrenAgesInRoom = remainingChildrenAges.slice(0, childrenInRoom);
-
-//     rooms.push({
-//       Adults: adultsInRoom,
-//       Children: childrenInRoom,
-//       ChildrenAges: childrenAgesInRoom.length ? childrenAgesInRoom : null,
-//     });
-
-//     remainingAdults -= adultsInRoom;
-//     remainingChildren -= childrenInRoom;
-//     remainingChildrenAges = remainingChildrenAges.slice(childrenInRoom);
-//   }
-
-//   return rooms;
-// };
-
-
-
-
-
-
-// src/hotel/utils/hotel.utils.ts
-
 import { hotelTypes } from '@/index';
 
 // ============================================================================
@@ -323,6 +267,8 @@ export const calculateRequiredRooms = (
   );
 };
 
+
+
 export const parseCoordinates = (
   mapStr?: string
 ): { lat: number; lng: number } | null => {
@@ -363,3 +309,5 @@ export const parseCoordinates = (
 
   return null;
 };
+
+
